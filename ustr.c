@@ -38,7 +38,29 @@ Returns an empty string on invalid range.
 */
 UStr substring(UStr s, int32_t start, int32_t end) {
 	// TODO: implement this
-
+	if (start >= s.codepoints || end > s.codepoints) {
+		UStr temp = new_ustr("");
+		return temp;
+	}
+	int starti = 0;
+	for (int i = 0; i < start; i++) {
+		int8_t temp = utf8_codepoint_size(s.contents[starti]);
+		starti += temp;
+	}
+	int total = end - start;
+	int endi = starti;
+	for (int i = 0; i < total; i++) {
+		endi += utf8_codepoint_size(s.contents[endi]);
+	}
+	int counter = 0;
+	char* newarr = malloc(endi - starti + 1);
+	for (int i = starti; i < endi; i++) {
+		newarr[counter] = s.contents[i];
+		counter++;
+	}
+	newarr[endi - starti] = '\0';
+	UStr sub = new_ustr(newarr);
+	return sub;
 }
 
 /*
