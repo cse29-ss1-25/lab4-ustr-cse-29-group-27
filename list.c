@@ -34,7 +34,7 @@ Given a list of strings and a separator string, returns a single string
 containing all the strings in list joined by the separator.
 */
 UStr join(List* list, UStr separator) {
-	Ustr result;
+	UStr result;
 
 	if(!list || list->size == 0){
 		result.codepoints = 0;
@@ -49,8 +49,8 @@ UStr join(List* list, UStr separator) {
 
 	for (int i = 0; i < list->size; i++){
 		total_bytes += list->data[i].bytes;
-		if (I < list->size - 1){
-			total_bytes += seperator.bytes;
+		if (i < list->size - 1){
+			total_bytes += separator.bytes;
 		}
 	}
 	char* buffer = malloc(total_bytes + 1);
@@ -68,8 +68,8 @@ UStr join(List* list, UStr separator) {
 		offset+= list->data[i].bytes;
 
 		if (i < list->size - 1){
-			memcpy(buffer+offset, seperator.contents, seperator.bytes);
-		offset+= seperator.bytes;	
+			memcpy(buffer+offset, separator.contents, separator.bytes);
+		offset+= separator.bytes;	
 		}
 	}
 	buffer[offset] = '\0';
@@ -78,12 +78,13 @@ UStr join(List* list, UStr separator) {
 	result.bytes = total_bytes;
 	int codepoints_total = 0;
 
-	for (int i = 0; i < list->size, i++){
+	for (int i = 0; i < list->size; i++){
 		codepoints_total += list->data[i].codepoints;
 		if (i < list->size - 1){
-			codepoints_total += seperator.codepoints;
+			codepoints_total += separator.codepoints;
 		}
 	}
+	result.codepoints = codepoints_total;
 
 	result.is_ascii = 1;
 	for (int i =0; i < list->size; i++){
@@ -92,7 +93,7 @@ UStr join(List* list, UStr separator) {
 			break;
 		}
 	}
-	if (seperator.is_ascii == 0){
+	if (separator.is_ascii == 0){
 		result.is_ascii = 0;
 	}
 	return result;
@@ -119,8 +120,8 @@ int8_t insert(List* list, UStr s, int32_t index) {
 			newCapacity = list->capacity * 2;
 		}
 
-		struct UStr* newData = realloc(list->data, newCapacity * sizeof(UStr));
-		if (!new_data){
+		UStr* newData = realloc(list->data, newCapacity * sizeof(UStr));
+		if (!newData){
 			return 0;
 		}
 		list->data = new_data;
@@ -171,17 +172,16 @@ Note that the delimiter could be of a length of more than 1 character
 */
 List split(UStr s, UStr separator) {
     // TODO: implement this
-	List result;
-        listInit(&result);
+	List result = new_list(4);
         if (separator.bytes == 0) {
                 listAppend(&result, s);
                 return result;
         }
         int startIndex = 0;
-        for (int i = 0; i <= s.len - separator.len; ) {
+        for (int i = 0; i <= s.bytes - separator.bytes; ) {
                 int match = 1;
 
-                for (int j = 0; j < separator.len; j++) {
+                for (int j = 0; j < separator.bytes; j++) {
                         if (s.contents[i + j] != separator.contents[j]) {
                                 match = 0;
                                 break;
@@ -189,7 +189,7 @@ List split(UStr s, UStr separator) {
                 }
 
                 if (match==1) {
-                        UStr part = ustrSubstr(s, startIndex, i);
+                        UStr part = substr(s, startIndex, i);
                         listAppend(&result, part);
                         i += separator.bytes;
                         startIndex = i;
@@ -199,7 +199,7 @@ List split(UStr s, UStr separator) {
                 }
         }
 
-        UStr end = ustrSubstr(s, startIndex, s.bytes);
+        UStr end = substr(s, startIndex, s.bytes);
         listAppend(&result, end);
 
         return result;
