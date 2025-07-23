@@ -124,7 +124,7 @@ int8_t insert(List* list, UStr s, int32_t index) {
 		if (!newData){
 			return 0;
 		}
-		list->data = new_data;
+		list->data = newData;
 		list->capacity = newCapacity;
 	}
 
