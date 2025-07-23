@@ -34,7 +34,7 @@ Given a list of strings and a separator string, returns a single string
 containing all the strings in list joined by the separator.
 */
 UStr join(List* list, UStr separator) {
-	Ustr result;
+	UStr result;
 
 	if(!list || list->size == 0){
 		result.codepoints = 0;
@@ -49,8 +49,8 @@ UStr join(List* list, UStr separator) {
 
 	for (int i = 0; i < list->size; i++){
 		total_bytes += list->data[i].bytes;
-		if (I < list->size - 1){
-			total_bytes += seperator.bytes;
+		if (i < list->size - 1){
+			total_bytes += separator.bytes;
 		}
 	}
 	char* buffer = malloc(total_bytes + 1);
@@ -68,8 +68,8 @@ UStr join(List* list, UStr separator) {
 		offset+= list->data[i].bytes;
 
 		if (i < list->size - 1){
-			memcpy(buffer+offset, seperator.contents, seperator.bytes);
-		offset+= seperator.bytes;	
+			memcpy(buffer+offset, separator.contents, separator.bytes);
+		offset+= separator.bytes;	
 		}
 	}
 	buffer[offset] = '\0';
@@ -78,12 +78,13 @@ UStr join(List* list, UStr separator) {
 	result.bytes = total_bytes;
 	int codepoints_total = 0;
 
-	for (int i = 0; i < list->size, i++){
+	for (int i = 0; i < list->size; i++){
 		codepoints_total += list->data[i].codepoints;
 		if (i < list->size - 1){
-			codepoints_total += seperator.codepoints;
+			codepoints_total += separator.codepoints;
 		}
 	}
+	result.codepoints = codepoints_total;
 
 	result.is_ascii = 1;
 	for (int i =0; i < list->size; i++){
@@ -92,7 +93,7 @@ UStr join(List* list, UStr separator) {
 			break;
 		}
 	}
-	if (seperator.is_ascii == 0){
+	if (separator.is_ascii == 0){
 		result.is_ascii = 0;
 	}
 	return result;
@@ -119,8 +120,8 @@ int8_t insert(List* list, UStr s, int32_t index) {
 			newCapacity = list->capacity * 2;
 		}
 
-		struct UStr* newData = realloc(list->data, newCapacity * sizeof(UStr));
-		if (!new_data){
+		UStr* newData = realloc(list->data, newCapacity * sizeof(UStr));
+		if (!newData){
 			return 0;
 		}
 		list->data = new_data;
