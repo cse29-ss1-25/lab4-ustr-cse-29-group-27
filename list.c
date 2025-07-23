@@ -145,6 +145,14 @@ Returns 1 on success, 0 if the index is invalid (out of bounds).
 */
 int8_t listRemoveAt(List* list, int32_t index) {
     // TODO: implement this
+	if (index < 0 || index >= list->size) {
+                return 0;
+        }
+        for (int32_t i = index; i < list->size - 1; i++) {
+                list->data[i] = list->data[i + 1];
+        }
+        list->size--;
+        return 1;
 
 }
 
@@ -163,5 +171,37 @@ Note that the delimiter could be of a length of more than 1 character
 */
 List split(UStr s, UStr separator) {
     // TODO: implement this
+	List result;
+        listInit(&result);
+        if (separator.bytes == 0) {
+                listAppend(&result, s);
+                return result;
+        }
+        int startIndex = 0;
+        for (int i = 0; i <= s.len - separator.len; ) {
+                int match = 1;
+
+                for (int j = 0; j < separator.len; j++) {
+                        if (s.contents[i + j] != separator.contents[j]) {
+                                match = 0;
+                                break;
+                        }
+                }
+
+                if (match==1) {
+                        UStr part = ustrSubstr(s, startIndex, i);
+                        listAppend(&result, part);
+                        i += separator.bytes;
+                        startIndex = i;
+                }
+                else {
+                        i++;
+                }
+        }
+
+        UStr end = ustrSubstr(s, startIndex, s.bytes);
+        listAppend(&result, end);
+
+        return result;
 
 }
