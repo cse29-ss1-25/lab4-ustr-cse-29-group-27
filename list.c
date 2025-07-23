@@ -172,17 +172,16 @@ Note that the delimiter could be of a length of more than 1 character
 */
 List split(UStr s, UStr separator) {
     // TODO: implement this
-	List result;
-        listInit(&result);
+	List result = new_list(4);
         if (separator.bytes == 0) {
                 listAppend(&result, s);
                 return result;
         }
         int startIndex = 0;
-        for (int i = 0; i <= s.len - separator.len; ) {
+        for (int i = 0; i <= s.bytes - separator.bytes; ) {
                 int match = 1;
 
-                for (int j = 0; j < separator.len; j++) {
+                for (int j = 0; j < separator.bytes; j++) {
                         if (s.contents[i + j] != separator.contents[j]) {
                                 match = 0;
                                 break;
@@ -190,7 +189,7 @@ List split(UStr s, UStr separator) {
                 }
 
                 if (match==1) {
-                        UStr part = ustrSubstr(s, startIndex, i);
+                        UStr part = substr(s, startIndex, i);
                         listAppend(&result, part);
                         i += separator.bytes;
                         startIndex = i;
@@ -200,7 +199,7 @@ List split(UStr s, UStr separator) {
                 }
         }
 
-        UStr end = ustrSubstr(s, startIndex, s.bytes);
+        UStr end = substr(s, startIndex, s.bytes);
         listAppend(&result, end);
 
         return result;
